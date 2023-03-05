@@ -2,7 +2,7 @@
   <div class="flex h-6 items-center">
     <input
       [id]="uid + '-checkbox'"
-      [(ngModel)]="checked"
+      [formControl]="model"
       [attr.aria-describedby]="name + '-description'"
       [name]="name"
       type="checkbox"

@@ -1,4 +1,5 @@
 import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
+import { FormControl } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
 
 import { combineLatest, filter, map, Observable, of, tap } from 'rxjs';
@@ -33,6 +34,8 @@ export class MainComponent implements OnInit, PlayerInterface {
 
   @ViewChild(VideoPlayerDirective)
   private videoPlayer!: VideoPlayerDirective;
+
+  cutModel = new FormControl(false);
 
   isPlaying: boolean = false;
 
@@ -90,6 +93,10 @@ export class MainComponent implements OnInit, PlayerInterface {
         return isMediaReady && !isLoading;
       })
     );
+
+    this.cutModel.valueChanges.subscribe((cut: boolean | null): void => {
+      this.onCutChange(cut === true);
+    });
   }
 
   onUpdatedVideoList(mediaList: IMedia[]): void {
@@ -102,6 +109,9 @@ export class MainComponent implements OnInit, PlayerInterface {
 
   onNewVideo(): void {
     this.videoStore.dispatch(loadVideos({ mediaList: [] }));
+    this.onReady(false);
+
+    this.cutModel.reset();
 
     this.isPlaying = false;
     this.duration = 0;

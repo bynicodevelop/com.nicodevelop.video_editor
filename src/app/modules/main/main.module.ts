@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { DropzoneComponent } from 'src/app/components/dropzone/dropzone.component';
 import { CheckboxComponent } from 'src/app/components/inputs/checkbox/checkbox.component';
@@ -24,6 +24,6 @@ import { MainComponent } from './main.component';
     SecondToTimePipe,
     CheckboxComponent,
   ],
-  imports: [CommonModule, MainRoutingModule, FormsModule],
+  imports: [CommonModule, MainRoutingModule, FormsModule, ReactiveFormsModule],
 })
 export class MainModule {}
