@@ -145,28 +145,6 @@ export class MainComponent implements OnInit, PlayerInterface {
       });
   }
 
-  onNoiseChange(noise: boolean): void {
-    // this.mediaList$
-    //   .pipe(
-    //     map((videos): IVideo | undefined => {
-    //       return videos[0];
-    //     }),
-    //     filter(
-    //       (video: IVideo | undefined): boolean =>
-    //         video?.audio?.noNoise === undefined
-    //     )
-    //   )
-    //   .subscribe((video: IVideo | undefined): void => {
-    //     if (video) {
-    //       this.videoStore.dispatch(
-    //         loadVideoWithoutNoise({
-    //           video,
-    //         })
-    //       );
-    //     }
-    //   });
-  }
-
   @HostListener('window:keydown.space', ['$event'])
   onSpace(event: KeyboardEvent): void {
     if (!this.isReady) return;

@@ -82,14 +82,6 @@
 
       <div class="space-x-5">
         <app-checkbox
-          #noiseValue
-          label="Filtre anti bruit"
-          hint="Permet la detection des bruits de fond dans la video et de les supprimer"
-          [disabled]="!(isReady | async)"
-          (change)="onNoiseChange(noiseValue.checked)"
-        ></app-checkbox>
-
-        <app-checkbox
           #cutValue
           label="Filtre cut video"
           hint="Permet la detection des silences dans la video et de couper la video
