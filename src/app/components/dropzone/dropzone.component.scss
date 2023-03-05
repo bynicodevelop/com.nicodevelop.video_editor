@@ -1,0 +1,17 @@
+:host {
+  .dropzone {
+    @apply border-2 border-dashed border-gray-400 rounded-lg text-gray-400 h-full w-full text-center;
+
+    :hover {
+      @apply cursor-pointer;
+    }
+
+    .content {
+      @apply flex flex-col items-center justify-center h-full p-4;
+    }
+
+    &.dragover {
+      @apply border-gray-900 text-gray-900;
+    }
+  }
+}

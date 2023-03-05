@@ -1,0 +1,105 @@
+<div class="wrapper">
+  <div
+    class="grid grid-cols-1 md:grid-cols-3 gap-x-5 gap-y-5 w-full aspect-video"
+  >
+    <div
+      class="w-1/3 md:w-auto aspect-[9/16] md:aspect-auto place-self-center md:place-self-auto"
+    >
+      <app-dropzone
+        *ngIf="!(mediaList$ | async)?.length"
+        (updatedVideoList)="onUpdatedVideoList($event)"
+      ></app-dropzone>
+
+      <div *ngFor="let media of mediaList$ | async">
+        <video
+          class="aspect-[9/16]"
+          [src]="media.video.sourceUrl"
+          [muted]="true"
+          [time]="time"
+          appVideoPlayer
+          #videoPlayer
+          (loadedmetadata)="onLoadedMetadata(videoPlayer)"
+          (timeupdate)="onTimeUpdate(videoPlayer)"
+        >
+        </video>
+      </div>
+    </div>
+
+    <div class="col-span-1 md:col-span-2">
+      <div class="flex justify-between mb-5">
+        <button
+          (click)="togglePlay()"
+          class="btn"
+          [disabled]="!(isReady | async)"
+        >
+          {{ isPlaying ? "Pause" : "Play" }}
+        </button>
+
+        <button
+          class="btn"
+          (click)="onNewVideo()"
+          [disabled]="!(mediaList$ | async)?.length"
+        >
+          Nouvelle vidéo
+        </button>
+      </div>
+
+      <div class="relative h-32 rounded-md shadow-md p-4 mb-4">
+        <div
+          *ngIf="isLoading$ | async"
+          class="absolute top-0 left-0 w-full h-full flex justify-center items-center"
+        >
+          <div
+            class="absolute z-10 top-0 left-0 w-full h-full bg-gray-400 bg-opacity-20 backdrop-blur rounded-md"
+          ></div>
+          <div class="relative z-20 text-gray-700">
+            Traitement en cours...
+          </div>
+        </div>
+
+        <div *ngFor="let media of mediaList$ | async">
+          <div
+            *ngIf="media.audio"
+            appAudioWavePlayer
+            [src]="media.audio.sourceUrl"
+            [silences]="media.audio.silences"
+            (seek)="onSeek($event)"
+            (ready)="onReady($event)"
+          >
+          </div>
+        </div>
+
+        <app-timer
+          [time]="time"
+          class="absolute bottom-4 left-4"
+        ></app-timer>
+
+        <app-timer
+          [time]="duration"
+          class="absolute bottom-4 right-4"
+        ></app-timer>
+      </div>
+
+      <div class="space-x-5">
+        <app-checkbox
+          #noiseValue
+          label="Filtre anti bruit"
+          hint="Permet la detection des bruits de fond dans la video et de les supprimer"
+          [disabled]="!(isReady | async)"
+          (change)="onNoiseChange(noiseValue.checked)"
+        ></app-checkbox>
+
+        <app-checkbox
+          #cutValue
+          label="Filtre cut video"
+          hint="Permet la detection des silences dans la video et de couper la video
+    en plusieurs parties"
+          [disabled]="!(isReady | async)"
+          (change)="onCutChange(cutValue.checked)"
+        ></app-checkbox>
+      </div>
+    </div>
+  </div>
+
+  <pre>{{ mediaList$ | async | json }}</pre>
+</div>

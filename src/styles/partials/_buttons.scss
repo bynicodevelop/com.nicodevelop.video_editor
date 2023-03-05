@@ -1,0 +1,11 @@
+.btn {
+  @apply rounded-md bg-white py-1.5 px-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300;
+
+  &:hover {
+    @apply ring-gray-400 bg-gray-50;
+  }
+
+  &:disabled {
+    @apply bg-gray-100 text-gray-400 ring-gray-200;
+  }
+}

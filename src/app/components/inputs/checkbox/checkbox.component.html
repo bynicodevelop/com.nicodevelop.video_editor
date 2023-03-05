@@ -1,0 +1,29 @@
+<div class="relative flex items-start">
+  <div class="flex h-6 items-center">
+    <input
+      [id]="uid + '-checkbox'"
+      [(ngModel)]="checked"
+      [attr.aria-describedby]="name + '-description'"
+      [name]="name"
+      type="checkbox"
+      class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-0 focus:ring-offset-0"
+      [class]="disabled ? 'bg-gray-100 cursor-not-allowed' : ''"
+      [disabled]="disabled"
+    />
+  </div>
+  <div class="ml-3">
+    <label
+      [for]="uid + '-checkbox'"
+      class="text-sm font-medium leading-6 text-gray-900"
+    >
+      {{ label }}
+    </label>
+    <p
+      *ngIf="hint"
+      id="cut-description"
+      class="text-sm text-gray-500"
+    >
+      {{ hint }}
+    </p>
+  </div>
+</div>

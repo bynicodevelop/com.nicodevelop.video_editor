@@ -1,0 +1,27 @@
+{
+  "tabWidth": 2,
+  "useTabs": false,
+  "htmlWhitespaceSensitivity": "ignore",
+  "printWidth": 80,
+  "overrides": [
+    {
+      "files": "*.html",
+      "options": {
+        "tabWidth": 2,
+        "useTabs": false,
+        "htmlWhitespaceSensitivity": "strict",
+        "printWidth": 80,
+        "singleAttributePerLine": true
+      }
+    },
+    {
+      "files": "*.js",
+      "options": {
+        "tabWidth": 2,
+        "useTabs": false,
+        "printWidth": 80,
+        "trailingComma": "all"
+      }
+    }
+  ]
+}
