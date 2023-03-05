@@ -37,7 +37,8 @@ export class VideoService {
   }
 
   private _silenceFilter(message: string): void {
-    const SILENCE_START_REGEX = /silence_start:\s+(\d+\.\d+)/g;
+    const SILENCE_START_REGEX =
+      /silence_start:\s+([+-]?\d+\.?\d*(?:[eE][+-]?\d+)?)/g;
     const SILENCE_END_REGEX = /silence_end:\s+(\d+\.\d+)/g;
     const silencesLength = this.silences.length;
 
