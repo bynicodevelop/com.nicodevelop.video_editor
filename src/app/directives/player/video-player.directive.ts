@@ -5,6 +5,8 @@ import {
   OnInit,
 } from '@angular/core';
 
+import { ISeekEvent } from 'src/app/models/seek_event';
+
 import { PlayerInterface } from './player-interface';
 
 @Directive({
@@ -31,14 +33,18 @@ export class VideoPlayerDirective implements OnInit, PlayerInterface {
 
   _time: number = 0;
 
-  constructor(
-    private videoPlayer: ElementRef,
-  ) {}
+  constructor(private videoPlayer: ElementRef) {}
 
   ngOnInit(): void {
     const video = this.videoPlayer.nativeElement as HTMLVideoElement;
 
     video.muted = this.muted;
+  }
+
+  seekTo(seekEvent: ISeekEvent): void {
+    const video = this.videoPlayer.nativeElement as HTMLVideoElement;
+
+    video.currentTime = seekEvent.value;
   }
 
   togglePlay(): void {

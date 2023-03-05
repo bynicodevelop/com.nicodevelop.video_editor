@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { SafeUrl } from '@angular/platform-browser';
 
+import { ISeekEvent } from 'src/app/models/seek_event';
 import { ISilence } from 'src/app/models/silence';
 import WaveSurfer from 'wavesurfer.js';
 import RegionsPlugin from 'wavesurfer.js/src/plugin/regions';
@@ -25,7 +26,7 @@ export class AudioWavePlayerDirective implements OnInit, PlayerInterface {
   silences: ISilence[] | undefined;
 
   @Output()
-  seek: EventEmitter<number> = new EventEmitter<number>();
+  seek: EventEmitter<ISeekEvent> = new EventEmitter<ISeekEvent>();
 
   @Output()
   ready: EventEmitter<boolean> = new EventEmitter<boolean>();
@@ -40,17 +41,37 @@ export class AudioWavePlayerDirective implements OnInit, PlayerInterface {
       waveColor: 'violet',
       progressColor: 'purple',
       barHeight: 1,
-      barWidth: 2,
+      barWidth: 1,
       height: 100,
       plugins: [RegionsPlugin.create({})],
     });
 
-    this.wavesurfer?.on('seek', (value: number): void => {
-      this.seek.emit(value);
+    this.wavesurfer?.on('seek', (value: number, automatic: boolean): void => {
+      if (automatic) return;
+
+      this.seek.emit({
+        value: value,
+        automatic: false,
+      });
     });
 
     this.wavesurfer?.on('ready', (): void => {
       this.ready.emit(true);
+    });
+
+    this.wavesurfer?.on('audioprocess', (value: number): void => {
+      if (this.silences === undefined) return;
+
+      const silenceRegion = this.silences.find(
+        (region): boolean => region.start <= value && region.end >= value
+      );
+
+      if (silenceRegion) {
+        this.seek.emit({
+          value: silenceRegion.end,
+          automatic: true,
+        });
+      }
     });
   }
 
@@ -71,6 +92,20 @@ export class AudioWavePlayerDirective implements OnInit, PlayerInterface {
 
   ngOnDestroy(): void {
     this.wavesurfer?.destroy();
+  }
+
+  seekTo(seekEvent: ISeekEvent): void {
+    if (!this.wavesurfer) {
+      return;
+    }
+
+    const duration = this.wavesurfer.getDuration();
+    const progress = seekEvent.value / duration;
+    const automatic = seekEvent.automatic;
+
+    if (automatic) {
+      this.wavesurfer.seekTo(progress);
+    }
   }
 
   togglePlay(): void {

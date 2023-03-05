@@ -8,6 +8,7 @@ import { VideoPlayerDirective } from 'src/app/directives/player/video-player.dir
 import { AudioEntity } from 'src/app/models/audio_entity';
 import { IMedia } from 'src/app/models/media';
 import { MediaEntity } from 'src/app/models/media_entity';
+import { ISeekEvent } from 'src/app/models/seek_event';
 import { VideoEntity } from 'src/app/models/video_entity';
 import {
   loadVideos,
@@ -115,8 +116,10 @@ export class MainComponent implements OnInit, PlayerInterface {
     this.time = video.currentTime;
   }
 
-  onSeek(value: number): void {
-    this.time = this.duration * value;
+  onSeek(seekEvent: ISeekEvent): void {
+    this.time = this.duration * seekEvent.value;
+
+    this.seekTo(seekEvent);
   }
 
   onReady(ready: boolean): void {
@@ -152,6 +155,11 @@ export class MainComponent implements OnInit, PlayerInterface {
     this.togglePlay();
 
     event.preventDefault();
+  }
+
+  seekTo(seekEvent: ISeekEvent): void {
+    this.audioWavePlayer.seekTo(seekEvent);
+    this.videoPlayer.seekTo(seekEvent);
   }
 
   togglePlay(): void {
