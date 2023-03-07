@@ -6,6 +6,8 @@ import { VideoService } from 'src/app/services/video.service';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 
 import {
+  exportVideo,
+  exportVideoSuccess,
   loadVideos,
   loadVideoSilence,
   loadVideoSilenceSuccess,
@@ -50,6 +52,18 @@ export class VideoEffects {
           this.videoService
             .getAudioWithoutNoise(action.media)
             .pipe(map((media): any => loadVideoWithoutNoiseSuccess({ media })))
+      )
+    );
+  });
+
+  exportVideo$ = createEffect((): Observable<any> => {
+    return this.actions$.pipe(
+      ofType(exportVideo),
+      mergeMap(
+        (action): Observable<any> =>
+          this.videoService
+            .exportVideo(action.media)
+            .pipe(map((media): any => exportVideoSuccess({ media })))
       )
     );
   });

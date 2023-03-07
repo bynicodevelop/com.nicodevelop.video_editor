@@ -31,3 +31,13 @@ export const loadVideoWithoutNoiseSuccess = createAction(
   '[Video] Load Video Without Noise Success',
   props<{ media: IMedia }>()
 );
+
+export const exportVideo = createAction(
+  '[Video] Export Video',
+  props<{ media: IMedia }>()
+);
+
+export const exportVideoSuccess = createAction(
+  '[Video] Export Video Success',
+  props<{ media: IMedia }>()
+);

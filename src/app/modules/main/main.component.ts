@@ -12,12 +12,14 @@ import { MediaEntity } from 'src/app/models/media_entity';
 import { ISeekEvent } from 'src/app/models/seek_event';
 import { VideoEntity } from 'src/app/models/video_entity';
 import {
+  exportVideo,
   loadVideos,
   loadVideoSilence,
 } from 'src/app/store/video/video.actions';
 import { VideoState } from 'src/app/store/video/video.reducer';
 import {
   selectMediaList,
+  selectOutput,
   selectVideoLoading,
 } from 'src/app/store/video/video.selectors';
 
@@ -44,6 +46,9 @@ export class MainComponent implements OnInit, PlayerInterface {
   mediaList$: Observable<MediaEntity[]> = this.videoStore
     .select(selectMediaList)
     .pipe(
+      tap((mediaList: IMedia[]): void =>
+        console.log(JSON.stringify(mediaList))
+      ),
       map((mediaList: IMedia[]): MediaEntity[] => {
         return mediaList.map((media: IMedia): MediaEntity => {
           return new MediaEntity(
@@ -60,13 +65,17 @@ export class MainComponent implements OnInit, PlayerInterface {
               this.sanitizer.bypassSecurityTrustUrl(
                 URL.createObjectURL(media.video.source!)
               )
-            )
+            ),
+            media.output
           );
         });
       })
     );
 
   isLoading$: Observable<boolean> = this.videoStore.select(selectVideoLoading);
+
+  outputFile$: Observable<Blob | undefined> =
+    this.videoStore.select(selectOutput);
 
   duration: number = 0;
   time: number = 0;
@@ -81,7 +90,6 @@ export class MainComponent implements OnInit, PlayerInterface {
       this.mediaList$,
       this.videoStore.select(selectVideoLoading),
     ]).pipe(
-      tap(console.log),
       map(([mediaList, isLoading]): boolean => {
         const isMediaReady =
           mediaList.length > 0 &&
@@ -96,6 +104,16 @@ export class MainComponent implements OnInit, PlayerInterface {
 
     this.cutModel.valueChanges.subscribe((cut: boolean | null): void => {
       this.onCutChange(cut === true);
+    });
+
+    // download output file
+    this.outputFile$.subscribe((outputFile: Blob | undefined): void => {
+      if (outputFile) {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(outputFile);
+        a.download = 'output.mp4';
+        a.click();
+      }
     });
   }
 
@@ -144,7 +162,7 @@ export class MainComponent implements OnInit, PlayerInterface {
         map((mediaList): IMedia | undefined => {
           return mediaList[0];
         }),
-        tap((media: IMedia | undefined): void => console.log(media)),
+        tap((media: IMedia | undefined): void => console.log('media', media)),
         filter((media: IMedia | undefined): boolean => !media?.audio?.silences)
       )
       .subscribe((media: IMedia | undefined): void => {
@@ -165,6 +183,25 @@ export class MainComponent implements OnInit, PlayerInterface {
     this.togglePlay();
 
     event.preventDefault();
+  }
+
+  onExport(): void {
+    this.mediaList$
+      .pipe(
+        map((mediaList): MediaEntity | undefined => {
+          return mediaList[0];
+        }),
+        filter((media: MediaEntity | undefined): boolean => !media?.output)
+      )
+      .subscribe((media: IMedia | undefined): void => {
+        if (media) {
+          this.videoStore.dispatch(
+            exportVideo({
+              media,
+            })
+          );
+        }
+      });
   }
 
   seekTo(seekEvent: ISeekEvent): void {

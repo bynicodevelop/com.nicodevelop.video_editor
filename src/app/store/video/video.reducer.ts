@@ -3,6 +3,8 @@ import { IMedia } from 'src/app/models/media';
 import { ActionReducer, createReducer, MetaReducer, on } from '@ngrx/store';
 
 import {
+  exportVideo,
+  exportVideoSuccess,
   loadVideos,
   loadVideoSilence,
   loadVideoSilenceSuccess,
@@ -87,6 +89,27 @@ export const videoReducer = createReducer(
         if (v.video.source === media.video.source) {
           return media;
         }
+
+        return v;
+      }),
+      loading: false,
+    };
+  }),
+  on(exportVideo, (state): VideoState => {
+    return {
+      ...state,
+      loading: true,
+    };
+  }),
+  on(exportVideoSuccess, (state, { media }): VideoState => {
+    return {
+      ...state,
+      mediaList: state.mediaList.map((v: IMedia): IMedia => {
+        if (v.video.source === media.video.source) {
+          return media;
+        }
+
+        console.log('json', JSON.stringify(v));
 
         return v;
       }),

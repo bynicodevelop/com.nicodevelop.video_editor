@@ -27,13 +27,23 @@
 
     <div class="col-span-1 md:col-span-2">
       <div class="flex justify-between mb-5">
-        <button
-          (click)="togglePlay()"
-          class="btn"
-          [disabled]="!(isReady | async)"
-        >
-          {{ isPlaying ? "Pause" : "Play" }}
-        </button>
+        <div class="space-x-2">
+          <button
+            (click)="togglePlay()"
+            class="btn"
+            [disabled]="!(isReady | async)"
+          >
+            {{ isPlaying ? "Pause" : "Play" }}
+          </button>
+
+          <button
+            (click)="onExport()"
+            class="btn"
+            [disabled]="!(isReady | async)"
+          >
+            Exporter
+          </button>
+        </div>
 
         <button
           class="btn"
@@ -50,7 +60,7 @@
           class="absolute top-0 left-0 w-full h-full flex justify-center items-center"
         >
           <div
-            class="absolute z-10 top-0 left-0 w-full h-full bg-red-400 bg-opacity-20 backdrop-blur rounded-md"
+            class="absolute z-10 top-0 left-0 w-full h-full bg-gray-400 bg-opacity-20 backdrop-blur rounded-md"
           ></div>
           <div class="relative z-20 text-gray-700">
             Traitement en cours...

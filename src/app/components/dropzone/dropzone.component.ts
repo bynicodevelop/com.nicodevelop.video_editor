@@ -33,6 +33,7 @@ export class DropzoneComponent {
           source: file,
         },
         audio: undefined,
+        output: undefined,
       };
     });
 

@@ -16,3 +16,9 @@ export const selectVideoLoading = createSelector(
   selectVideoState,
   (state: VideoState): boolean => state.loading
 );
+
+export const selectOutput = createSelector(
+  selectVideoState,
+  (state: VideoState): Blob | undefined =>
+    state.mediaList.find((media): Blob | undefined => media.output)?.output
+);
