@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Output } from '@angular/core';
-import { DomSanitizer } from '@angular/platform-browser';
 
 import { IMedia } from 'src/app/models/media';
 
@@ -13,8 +12,6 @@ export class DropzoneComponent {
 
   @Output()
   updatedVideoList = new EventEmitter<IMedia[]>();
-
-  constructor(private sanitizer: DomSanitizer) {}
 
   onFileDropped($event: FileList[] | any): void {
     let files: FileList[] = $event;
