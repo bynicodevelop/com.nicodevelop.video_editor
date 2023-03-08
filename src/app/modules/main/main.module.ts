@@ -9,6 +9,7 @@ import { DndDirective } from 'src/app/directives/dnd.directive';
 import { AudioWavePlayerDirective } from 'src/app/directives/player/audio-wave-player.directive';
 import { VideoPlayerDirective } from 'src/app/directives/player/video-player.directive';
 import { SecondToTimePipe } from 'src/app/formatters/second-to-time.pipe';
+import { VideoFacade } from 'src/app/store/video/video.facade';
 
 import { MainRoutingModule } from './main-routing.module';
 import { MainComponent } from './main.component';
@@ -25,5 +26,6 @@ import { MainComponent } from './main.component';
     CheckboxComponent,
   ],
   imports: [CommonModule, MainRoutingModule, FormsModule, ReactiveFormsModule],
+  providers: [VideoFacade],
 })
 export class MainModule {}

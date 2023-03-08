@@ -11,19 +11,7 @@ import { IMedia } from 'src/app/models/media';
 import { MediaEntity } from 'src/app/models/media_entity';
 import { ISeekEvent } from 'src/app/models/seek_event';
 import { VideoEntity } from 'src/app/models/video_entity';
-import {
-  exportVideo,
-  loadVideos,
-  loadVideoSilence,
-} from 'src/app/store/video/video.actions';
-import { VideoState } from 'src/app/store/video/video.reducer';
-import {
-  selectMediaList,
-  selectOutput,
-  selectVideoLoading,
-} from 'src/app/store/video/video.selectors';
-
-import { Store } from '@ngrx/store';
+import { VideoFacade } from 'src/app/store/video/video.facade';
 
 @Component({
   selector: 'app-main',
@@ -43,52 +31,47 @@ export class MainComponent implements OnInit, PlayerInterface {
 
   isReady: Observable<boolean> = of(false);
 
-  mediaList$: Observable<MediaEntity[]> = this.videoStore
-    .select(selectMediaList)
-    .pipe(
-      tap((mediaList: IMedia[]): void =>
-        console.log(JSON.stringify(mediaList))
-      ),
-      map((mediaList: IMedia[]): MediaEntity[] => {
-        return mediaList.map((media: IMedia): MediaEntity => {
-          return new MediaEntity(
-            media.audio
-              ? new AudioEntity(
-                  media.audio?.source,
-                  URL.createObjectURL(media.audio?.source!),
-                  media.audio?.noNoise,
-                  media.audio?.silences
-                )
-              : undefined,
-            new VideoEntity(
-              media.video.source!,
-              this.sanitizer.bypassSecurityTrustUrl(
-                URL.createObjectURL(media.video.source!)
+  mediaList$: Observable<MediaEntity[]> = this.videoFacade.getVideos().pipe(
+    tap((mediaList: IMedia[]): void => console.log(JSON.stringify(mediaList))),
+    map((mediaList: IMedia[]): MediaEntity[] => {
+      return mediaList.map((media: IMedia): MediaEntity => {
+        return new MediaEntity(
+          media.audio
+            ? new AudioEntity(
+                media.audio?.source,
+                URL.createObjectURL(media.audio?.source!),
+                media.audio?.noNoise,
+                media.audio?.silences
               )
-            ),
-            media.output
-          );
-        });
-      })
-    );
+            : undefined,
+          new VideoEntity(
+            media.video.source!,
+            this.sanitizer.bypassSecurityTrustUrl(
+              URL.createObjectURL(media.video.source!)
+            )
+          ),
+          media.output
+        );
+      });
+    })
+  );
 
-  isLoading$: Observable<boolean> = this.videoStore.select(selectVideoLoading);
+  isLoading$: Observable<boolean> = this.videoFacade.videoIsLoading();
 
-  outputFile$: Observable<Blob | undefined> =
-    this.videoStore.select(selectOutput);
+  outputFile$: Observable<Blob | undefined> = this.videoFacade.getOutput();
 
   duration: number = 0;
   time: number = 0;
 
   constructor(
-    private videoStore: Store<VideoState>,
+    private videoFacade: VideoFacade,
     private sanitizer: DomSanitizer
   ) {}
 
   ngOnInit(): void {
     this.isReady = combineLatest([
       this.mediaList$,
-      this.videoStore.select(selectVideoLoading),
+      this.videoFacade.videoIsLoading(),
     ]).pipe(
       map(([mediaList, isLoading]): boolean => {
         const isMediaReady =
@@ -106,7 +89,6 @@ export class MainComponent implements OnInit, PlayerInterface {
       this.onCutChange(cut === true);
     });
 
-    // download output file
     this.outputFile$.subscribe((outputFile: Blob | undefined): void => {
       if (outputFile) {
         const a = document.createElement('a');
@@ -118,15 +100,11 @@ export class MainComponent implements OnInit, PlayerInterface {
   }
 
   onUpdatedVideoList(mediaList: IMedia[]): void {
-    this.videoStore.dispatch(
-      loadVideos({
-        mediaList,
-      })
-    );
+    this.videoFacade.loadVideos(mediaList);
   }
 
   onNewVideo(): void {
-    this.videoStore.dispatch(loadVideos({ mediaList: [] }));
+    this.videoFacade.loadVideos([]);
     this.onReady(false);
 
     this.cutModel.reset();
@@ -167,11 +145,7 @@ export class MainComponent implements OnInit, PlayerInterface {
       )
       .subscribe((media: IMedia | undefined): void => {
         if (media) {
-          this.videoStore.dispatch(
-            loadVideoSilence({
-              media,
-            })
-          );
+          this.videoFacade.searchSilences(media);
         }
       });
   }
@@ -195,11 +169,7 @@ export class MainComponent implements OnInit, PlayerInterface {
       )
       .subscribe((media: IMedia | undefined): void => {
         if (media) {
-          this.videoStore.dispatch(
-            exportVideo({
-              media,
-            })
-          );
+          this.videoFacade.exportVideo(media);
         }
       });
   }
